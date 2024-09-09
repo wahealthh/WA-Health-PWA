@@ -22,3 +22,4 @@ via SSH - git clone git@github.com:wahealthh/WA-Health-PWA.git
 ## Environment Variables
 
 This project does not require any environment variables. All necessary configurations are handled within in the backend
+
