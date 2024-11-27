@@ -8,6 +8,7 @@ import Login from "./pages/auth/Login";
 import LandingPage from "./pages/LandingPage";
 import MainLayout from "./layouts/MainLayout";
 import Register from "./pages/auth/Register";
+import ChronicCareManagement from "./pages/ChronicCareManagement";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -15,6 +16,10 @@ const router = createBrowserRouter(
       <Route index element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route
+        path="/chronic-care-management"
+        element={<ChronicCareManagement />}
+      />
     </Route>
   )
 );
