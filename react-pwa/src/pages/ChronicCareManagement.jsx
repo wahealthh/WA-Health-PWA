@@ -2,8 +2,32 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CallHistoryCard from "@/components/cards/cqm/CallHistoryCard";
 import AppointmentTimeCard from "@/components/cards/cqm/AppointmentTimeCard";
+import { useState, useEffect } from "react";
 
 const ChronicCareManagement = () => {
+  const [calls, setCalls] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCalls = async () => {
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:8000/patients/calls?limit=10"
+        );
+        if (!response.ok) throw new Error("Failed to fetch calls");
+        const data = await response.json();
+        setCalls(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCalls();
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen w-full">
       <Navbar />
@@ -14,10 +38,11 @@ const ChronicCareManagement = () => {
             <h2 className="text-xl font-semibold text-[#004085]">
               Patient Calls
             </h2>
-            <CallHistoryCard />
-            <CallHistoryCard />
-            <CallHistoryCard />
-            <CallHistoryCard />
+            <CallHistoryCard
+              calls={calls}
+              isLoading={isLoading}
+              error={error}
+            />
           </section>
 
           {/* Aside area (40%) */}
