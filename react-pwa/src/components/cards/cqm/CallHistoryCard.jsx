@@ -37,6 +37,9 @@ const CallHistoryCard = ({ calls, isLoading, error }) => {
 
   if (isLoading) return <div>Loading calls...</div>;
   if (error) return <div>Error: {error}</div>;
+  if (!calls) {
+    return <div>No calls available</div>;
+  }
 
   return (
     <>
@@ -49,10 +52,7 @@ const CallHistoryCard = ({ calls, isLoading, error }) => {
               <CardDescription className="text-[#004085]">
                 <p>Phone: {call.phone}</p>
                 {call.appointment_date && (
-                  <p>
-                    Appointment Date:{" "}
-                    {new Date(call.appointment_date).toLocaleDateString()}
-                  </p>
+                  <p>Appointment Date: {call.appointment_date}</p>
                 )}
                 {call.appointment_time && (
                   <p>Appointment Time: {call.appointment_time}</p>
