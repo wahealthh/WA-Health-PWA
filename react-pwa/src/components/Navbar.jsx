@@ -2,9 +2,9 @@ import { FaHeartCirclePlus } from "react-icons/fa6";
 import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
+  { label: "Call History", path: "/call-history" },
   { label: "Dashboard", path: "/dashboard" },
-  { label: "Patients", path: "/patients" },
-  { label: "Appointments", path: "/appointments" },
+  { label: "Due Patients", path: "/due-patients" },
   { label: "Reports", path: "/reports" },
 ];
 
