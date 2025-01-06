@@ -13,7 +13,7 @@ const CallHistoryPage = () => {
     const fetchCalls = async () => {
       try {
         const response = await fetch(
-          "https://recall-product-backend.onrender.com/patients/calls?limit=10"
+          "https://recall-product-backend.onrender.com/patients/calls?limit=50"
         );
         if (!response.ok) throw new Error("Failed to fetch calls");
         const data = await response.json();
