@@ -11,6 +11,8 @@ import MainLayout from "./layouts/MainLayout";
 import Register from "./pages/auth/Register";
 import CallHistoryPage from "./pages/CallHistoryPage";
 import DuePatientsPage from "./pages/auth/DuePatientsPage";
+import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -18,18 +20,20 @@ const router = createBrowserRouter(
       <Route index element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/call-history" element={<CallHistoryPage />} />
-      <Route path="/due-patients" element={<DuePatientsPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/call-history" element={<CallHistoryPage />} />
+        <Route path="/due-patients" element={<DuePatientsPage />} />
+      </Route>
     </Route>
   )
 );
 
 const App = () => {
   return (
-    <>
+    <AuthProvider>
       <Toaster />
       <RouterProvider router={router} />
-    </>
+    </AuthProvider>
   );
 };
 

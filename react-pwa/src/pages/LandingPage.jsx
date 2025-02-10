@@ -13,9 +13,16 @@ const LandingPage = () => {
             Dishcharge documents, referrals, register patients, and track
             licenses.
           </p>
-          <Link to="/login">
-            <Button className="rounded-full w-32 mt-12">Login</Button>
-          </Link>
+          <div className="flex gap-4 mt-12">
+            <Link to="/login">
+              <Button className="rounded-full w-32">Login</Button>
+            </Link>
+            <Link to="/register">
+              <Button variant="outline" className="rounded-full w-32">
+                Sign Up
+              </Button>
+            </Link>
+          </div>
         </div>
         <div>
           <img

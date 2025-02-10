@@ -4,12 +4,15 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import logo from "@/assets/logo-side.png";
+import { Link } from "react-router-dom";
 const Register = () => {
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
-      <div>
-        <img src={logo} alt="WA-Health" className="h-16 m-6 drop-shadow-lg" />
-      </div>
+      <Link to="/">
+        <div>
+          <img src={logo} alt="WA-Health" className="h-16 m-6 drop-shadow-lg" />
+        </div>
+      </Link>
       <Card className="mx-auto min-w-sm shadow-lg">
         <CardHeader>
           <CardTitle>

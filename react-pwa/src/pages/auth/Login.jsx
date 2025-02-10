@@ -6,13 +6,42 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logo from "@/assets/logo-side.png";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Login = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const formData = new FormData(e.target);
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    try {
+      const success = await login(email, password);
+      if (success) {
+        const from = location.state?.from?.pathname || "/due-patients";
+        navigate(from, { replace: true });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
-      <div>
-        <img src={logo} alt="WA-Health" className="h-16 m-6 drop-shadow-lg" />
-      </div>
+      <Link to={"/"}>
+        <div>
+          <img src={logo} alt="WA-Health" className="h-16 m-6 drop-shadow-lg" />
+        </div>
+      </Link>
       <Card className="mx-auto min-w-sm shadow-lg">
         <CardHeader>
           <CardTitle>
@@ -25,47 +54,49 @@ const Login = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="admin@nhs.net"
-                className="w-[325px]"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@nhs.net"
+                  className="w-[325px]"
+                  required
+                />
               </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="•••••••••••"
-                required
-              />
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="•••••••••••"
+                  required
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="terms" />
+                <label
+                  htmlFor="terms"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Remember me
+                </label>
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                Login
+              </Button>
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="terms" />
-              <label
-                htmlFor="terms"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Remember me
-              </label>
+            <div className="mt-4 text-center text-sm">
+              Don&apos;t have an account?{" "}
+              <Link to="/register" className="underline">
+                Sign up
+              </Link>
             </div>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-          </div>
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link to="/register" className="underline">
-              Sign up
-            </Link>
-          </div>
+          </form>
         </CardContent>
       </Card>
       <Link
