@@ -45,7 +45,15 @@ const Register = () => {
                 required
               />
             </div>
-
+            <div className="grid gap-2">
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="Phone Number"
+                className="w-[325px]"
+                required
+              />
+            </div>
             <div className="grid gap-2">
               <Input
                 id="address"
