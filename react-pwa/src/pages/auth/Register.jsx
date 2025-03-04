@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import logo from "@/assets/logo-side.png";
 import { Link } from "react-router-dom";
+
 const Register = () => {
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
@@ -53,6 +54,18 @@ const Register = () => {
                 required
               />
             </div>
+
+            {/* Single Address Field */}
+            <div className="grid gap-2">
+              <Input
+                id="address"
+                type="text"
+                placeholder="Address"
+                className="w-[325px]"
+                required
+              />
+            </div>
+
             <div className="grid gap-2">
               <div className="flex items-center"></div>
               <Input
@@ -77,7 +90,7 @@ const Register = () => {
                 htmlFor="terms"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Remember me
+                I agree to the Terms and Conditions
               </label>
             </div>
             <Button type="submit" className="w-full">
