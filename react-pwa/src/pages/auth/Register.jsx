@@ -29,9 +29,9 @@ const Register = () => {
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Input
-                id="name"
+                id="GP"
                 type="text"
-                placeholder="Name"
+                placeholder="Name of General Practice"
                 className="w-[325px]"
                 required
               />
@@ -45,17 +45,7 @@ const Register = () => {
                 required
               />
             </div>
-            <div className="grid gap-2">
-              <Input
-                id="GP"
-                type="text"
-                placeholder="Name of General Practice"
-                className="w-[325px]"
-                required
-              />
-            </div>
 
-            {/* Single Address Field */}
             <div className="grid gap-2">
               <Input
                 id="address"
