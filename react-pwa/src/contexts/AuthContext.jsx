@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await fetch("http://your-backend/api/auth/verify", {
+      const response = await fetch("http://localhost:8000/auth/me", {
         credentials: "include",
       });
       setIsAuthenticated(response.ok);
@@ -29,19 +29,27 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch("http://your-backend/api/auth/login", {
+      const formDataObj = new FormData();
+      formDataObj.append("username", email);
+      formDataObj.append("password", password);
+
+      const response = await fetch("http://localhost:8000/auth/token", {
         method: "POST",
+        body: formDataObj,
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+        if (
+          data.detail &&
+          Array.isArray(data.detail) &&
+          data.detail.length > 0
+        ) {
+          throw new Error(data.detail[0].msg || "Login failed");
+        }
+        throw new Error(data.detail || "Login failed");
       }
 
       setIsAuthenticated(true);
@@ -55,7 +63,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch("http://your-backend/api/auth/logout", {
+      await fetch("http://localhost:8000/auth/logout", {
         method: "POST",
         credentials: "include",
       });
@@ -70,7 +78,9 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, login, logout, checkAuthStatus }}
+    >
       {children}
     </AuthContext.Provider>
   );

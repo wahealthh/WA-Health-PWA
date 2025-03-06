@@ -8,12 +8,13 @@ import { Label } from "@/components/ui/label";
 import logo from "@/assets/logo-side.png";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { toast } from "sonner";
 import Loading from "@/components/loading";
+import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -34,39 +35,14 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Create FormData object
-      const formDataObj = new FormData();
-      formDataObj.append("username", formData.email);
-      formDataObj.append("password", formData.password);
+      const success = await login(formData.email, formData.password);
 
-      const response = await fetch("http://localhost:8000/auth/token", {
-        method: "POST",
-        body: formDataObj,
-        credentials: "include", // Important for cookies
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Handle structured error messages
-        if (
-          data.detail &&
-          Array.isArray(data.detail) &&
-          data.detail.length > 0
-        ) {
-          throw new Error(data.detail[0].msg || "Login failed");
-        }
-        throw new Error(data.detail || "Login failed");
+      if (success) {
+        // Navigate to the protected route or the page user was trying to access
+        const from = location.state?.from?.pathname || "/due-patients";
+        navigate(from, { replace: true });
       }
-
-      // Login successful
-      toast.success("Successfully logged in!");
-
-      // Navigate to the protected route or the page user was trying to access
-      const from = location.state?.from?.pathname || "/due-patients";
-      navigate(from, { replace: true });
     } catch (error) {
-      toast.error(error.message || "Login failed");
       console.error("Login error:", error);
     } finally {
       setIsLoading(false);
