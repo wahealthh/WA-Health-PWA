@@ -7,33 +7,75 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logo from "@/assets/logo-side.png";
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
+import Loading from "@/components/loading";
 
 const Login = () => {
-  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    remember: false,
+  });
+
+  const handleChange = (e) => {
+    const { id, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: type === "checkbox" ? checked : value,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData(e.target);
-    const email = formData.get("email");
-    const password = formData.get("password");
-
     try {
-      const success = await login(email, password);
-      if (success) {
-        const from = location.state?.from?.pathname || "/due-patients";
-        navigate(from, { replace: true });
+      // Create FormData object
+      const formDataObj = new FormData();
+      formDataObj.append("username", formData.email);
+      formDataObj.append("password", formData.password);
+
+      const response = await fetch("http://localhost:8000/auth/token", {
+        method: "POST",
+        body: formDataObj,
+        credentials: "include", // Important for cookies
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle structured error messages
+        if (
+          data.detail &&
+          Array.isArray(data.detail) &&
+          data.detail.length > 0
+        ) {
+          throw new Error(data.detail[0].msg || "Login failed");
+        }
+        throw new Error(data.detail || "Login failed");
       }
+
+      // Login successful
+      toast.success("Successfully logged in!");
+
+      // Navigate to the protected route or the page user was trying to access
+      const from = location.state?.from?.pathname || "/due-patients";
+      navigate(from, { replace: true });
+    } catch (error) {
+      toast.error(error.message || "Login failed");
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
@@ -64,6 +106,8 @@ const Login = () => {
                   placeholder="admin@nhs.net"
                   className="w-[325px]"
                   required
+                  value={formData.email}
+                  onChange={handleChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -75,18 +119,26 @@ const Login = () => {
                   type="password"
                   placeholder="•••••••••••"
                   required
+                  value={formData.password}
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex items-center space-x-2">
-                <Checkbox id="terms" />
+                <Checkbox
+                  id="remember"
+                  checked={formData.remember}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, remember: checked }))
+                  }
+                />
                 <label
-                  htmlFor="terms"
+                  htmlFor="remember"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Remember me
                 </label>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full">
                 Login
               </Button>
             </div>
