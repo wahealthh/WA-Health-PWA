@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await fetch("http://localhost:8000/auth/me", {
+      const response = await fetch("http://localhost:8000/admin/me", {
         credentials: "include",
       });
       setIsAuthenticated(response.ok);
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
       formDataObj.append("username", email);
       formDataObj.append("password", password);
 
-      const response = await fetch("http://localhost:8000/auth/token", {
+      const response = await fetch("http://localhost:8001/auth/token", {
         method: "POST",
         body: formDataObj,
         credentials: "include",
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch("http://localhost:8000/auth/logout", {
+      await fetch("http://localhost:8001/auth/logout", {
         method: "POST",
         credentials: "include",
       });
