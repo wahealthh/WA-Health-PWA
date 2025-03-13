@@ -7,33 +7,51 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logo from "@/assets/logo-side.png";
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useLocation } from "react-router-dom";
+import Loading from "@/components/loading";
+import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
-  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    remember: false,
+  });
+
+  const handleChange = (e) => {
+    const { id, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: type === "checkbox" ? checked : value,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData(e.target);
-    const email = formData.get("email");
-    const password = formData.get("password");
-
     try {
-      const success = await login(email, password);
+      const success = await login(formData.email, formData.password);
+
       if (success) {
-        const from = location.state?.from?.pathname || "/due-patients";
+        // Navigate to the protected route or the page user was trying to access
+        const from = location.state?.from?.pathname || "/dashboard";
         navigate(from, { replace: true });
       }
+    } catch (error) {
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
@@ -64,6 +82,8 @@ const Login = () => {
                   placeholder="admin@nhs.net"
                   className="w-[325px]"
                   required
+                  value={formData.email}
+                  onChange={handleChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -75,18 +95,26 @@ const Login = () => {
                   type="password"
                   placeholder="•••••••••••"
                   required
+                  value={formData.password}
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex items-center space-x-2">
-                <Checkbox id="terms" />
+                <Checkbox
+                  id="remember"
+                  checked={formData.remember}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, remember: checked }))
+                  }
+                />
                 <label
-                  htmlFor="terms"
+                  htmlFor="remember"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Remember me
                 </label>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full">
                 Login
               </Button>
             </div>

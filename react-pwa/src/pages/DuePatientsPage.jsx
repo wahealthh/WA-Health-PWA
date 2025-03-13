@@ -4,7 +4,8 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DuePatientsCard from "@/components/cards/cqm/DuePatientsCard";
 
-const API_URL = "https://recall-product-backend.onrender.com/due_patients";
+const API_URL =
+  "https://recall-product-backend.onrender.com/patients/due_patients";
 
 const DuePatientsPage = () => {
   const [patients, setPatients] = useState([]);
