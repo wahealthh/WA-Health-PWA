@@ -1,9 +1,8 @@
+/* eslint-disable react/prop-types */
 import {
-  BarChart3,
   Calendar,
   Home,
   Phone,
-  Settings,
   Users,
   HelpCircle,
   MessageSquare,
@@ -32,16 +31,6 @@ const data = {
       url: "/dashboard",
       icon: Home,
       isActive: true,
-      items: [
-        {
-          title: "Overview",
-          url: "/dashboard",
-        },
-        {
-          title: "Analytics",
-          url: "/dashboard/analytics",
-        },
-      ],
     },
     {
       title: "Patients",
@@ -54,11 +43,12 @@ const data = {
         },
         {
           title: "All Patients",
-          url: "/all-patients",
+          url: "/due-patients",
         },
         {
           title: "Add Patient",
           url: "/add-patient",
+          disabled: true,
         },
       ],
     },
@@ -71,62 +61,28 @@ const data = {
           title: "Call History",
           url: "/call-history",
         },
-        {
-          title: "Scheduled Calls",
-          url: "/scheduled-calls",
-        },
       ],
     },
     {
       title: "Appointments",
       url: "/appointments",
       icon: Calendar,
+      disabled: true,
       items: [
         {
           title: "Today",
           url: "/appointments/today",
+          disabled: true,
         },
         {
           title: "Upcoming",
           url: "/appointments/upcoming",
+          disabled: true,
         },
         {
           title: "Calendar",
           url: "/appointments/calendar",
-        },
-      ],
-    },
-    {
-      title: "Reports",
-      url: "/reports",
-      icon: BarChart3,
-      items: [
-        {
-          title: "Performance",
-          url: "/reports/performance",
-        },
-        {
-          title: "Patient Metrics",
-          url: "/reports/patients",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings,
-      items: [
-        {
-          title: "Profile",
-          url: "/settings/profile",
-        },
-        {
-          title: "Practice",
-          url: "/settings/practice",
-        },
-        {
-          title: "Notifications",
-          url: "/settings/notifications",
+          disabled: true,
         },
       ],
     },
@@ -170,7 +126,7 @@ export function AppSidebar({ userInfo, ...props }) {
             <SidebarMenuButton size="lg" asChild>
               <a href="/dashboard">
                 <div className="flex items-center justify-center">
-                  <img src={logo} alt="WA Health Logo" className="w-10 h-10" />
+                  <img src={logo} alt="WA Health Logo" className="size-7" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold text-primary">
