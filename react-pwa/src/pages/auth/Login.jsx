@@ -39,7 +39,7 @@ const Login = () => {
 
       if (success) {
         // Navigate to the protected route or the page user was trying to access
-        const from = location.state?.from?.pathname || "/due-patients";
+        const from = location.state?.from?.pathname || "/dashboard";
         navigate(from, { replace: true });
       }
     } catch (error) {

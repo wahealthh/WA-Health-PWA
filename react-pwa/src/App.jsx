@@ -11,7 +11,8 @@ import MainLayout from "./layouts/MainLayout";
 import Register from "./pages/auth/Register";
 import RegisterSuccess from "./pages/auth/RegisterSuccess";
 import CallHistoryPage from "./pages/CallHistoryPage";
-import DuePatientsPage from "./pages/auth/DuePatientsPage";
+import DuePatientsPage from "./pages/DuePatientsPage";
+import DashboardPage from "./pages/DashboardPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
       <Route element={<ProtectedRoute />}>
         <Route path="/call-history" element={<CallHistoryPage />} />
         <Route path="/due-patients" element={<DuePatientsPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
       </Route>
     </Route>
   )
