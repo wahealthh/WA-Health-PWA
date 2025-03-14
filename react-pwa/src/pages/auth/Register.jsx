@@ -83,7 +83,7 @@ const Register = () => {
     try {
       // First, register the admin
       const adminResponse = await fetch(
-        "http://localhost:8000/admin/register",
+        "https://recall-backend.wahealth.co.uk/admin/register",
         {
           method: "POST",
           headers: {
@@ -108,7 +108,7 @@ const Register = () => {
 
       // Then, register the practice
       const practiceResponse = await fetch(
-        "http://localhost:8000/practice/register",
+        "https://recall-backend.wahealth.co.uk/practice/register",
         {
           method: "POST",
           headers: {

@@ -41,9 +41,12 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch("http://localhost:8000/admin/me", {
-          credentials: "include",
-        });
+        const response = await fetch(
+          "https://recall-backend.wahealth.co.uk/admin/me",
+          {
+            credentials: "include",
+          }
+        );
 
         if (!response.ok) throw new Error("Failed to fetch user info");
 
