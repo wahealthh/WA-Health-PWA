@@ -32,17 +32,16 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const formDataObj = {
-        username: email,
-        password: password,
-      };
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
 
       const response = await fetch("https://auth.wahealth.co.uk/auth/token", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: JSON.stringify(formDataObj),
+        body: formData,
         credentials: "include",
       });
 
