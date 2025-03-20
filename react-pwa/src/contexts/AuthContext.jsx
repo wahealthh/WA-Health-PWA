@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
         password: password,
       };
 
-      const response = await fetch("https://auth.wahealth.co.uk/auth/login", {
+      const response = await fetch("https://auth.wahealth.co.uk/auth/token", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
