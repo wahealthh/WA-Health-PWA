@@ -14,7 +14,7 @@ const DuePatientsCard = ({ patients, isLoading, error }) => {
     setCallingPatient(patient.number);
     try {
       const response = await fetch(
-        "https://recall-product-backend.onrender.com/patients/call_patient",
+        "https://recall-backend.wahealth.co.uk/patients/call_patient",
         {
           method: "POST",
           headers: {

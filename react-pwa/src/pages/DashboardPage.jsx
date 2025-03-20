@@ -77,7 +77,7 @@ const DashboardPage = () => {
     const fetchCalls = async () => {
       try {
         const response = await fetch(
-          "https://recall-product-backend.onrender.com/patients/calls?limit=10"
+          "https://recall-backend.wahealth.co.uk/patients/calls?limit=10"
         );
         if (!response.ok) throw new Error("Failed to fetch calls");
         const data = await response.json();
@@ -98,7 +98,7 @@ const DashboardPage = () => {
     const fetchPatients = async () => {
       try {
         const response = await fetch(
-          "https://recall-product-backend.onrender.com/patients/due_patients"
+          "https://recall-backend.wahealth.co.uk/patients/due_patients"
         );
         if (!response.ok) throw new Error("Failed to fetch patients");
         const data = await response.json();
