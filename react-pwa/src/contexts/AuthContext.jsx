@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const formDataObj = {
-        email: email,
+        username: email,
         password: password,
       };
 
