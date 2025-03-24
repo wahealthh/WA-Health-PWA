@@ -84,7 +84,6 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      // First, register the admin
       const adminResponse = await fetch(
         "https://recall-backend.wahealth.co.uk/admin/register",
         {
@@ -106,6 +105,13 @@ const Register = () => {
       const adminData = await adminResponse.json();
 
       if (!adminResponse.ok) {
+        // Handle the specific password validation error
+        if (adminData.detail && Array.isArray(adminData.detail)) {
+          const errorMessage = adminData.detail[0]?.msg;
+          if (errorMessage?.includes("Password must be")) {
+            throw new Error(errorMessage);
+          }
+        }
         const errorMessage =
           adminData.detail?.detail?.[0]?.msg || "Admin registration failed";
         throw new Error(errorMessage);
