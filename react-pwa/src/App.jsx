@@ -18,6 +18,7 @@ import DashboardPage from "./pages/DashboardPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ResetTokenExpired from "@/pages/auth/ResetTokenExpired";
+import EmailVerified from "./pages/auth/EmailVerified";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,6 +30,7 @@ const router = createBrowserRouter(
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/reset-token-expired" element={<ResetTokenExpired />} />
+      <Route path="/email-verified" element={<EmailVerified />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/call-history" element={<CallHistoryPage />} />
         <Route path="/due-patients" element={<DuePatientsPage />} />
