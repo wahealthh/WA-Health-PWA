@@ -8,6 +8,7 @@ import logo from "@/assets/logo-side.png";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Loading from "@/components/loading";
+import { Eye, EyeOff } from "lucide-react";
 
 const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +27,8 @@ const Register = () => {
     password2: "",
     terms: false,
   });
+  const [showPassword1, setShowPassword1] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -103,7 +106,9 @@ const Register = () => {
       const adminData = await adminResponse.json();
 
       if (!adminResponse.ok) {
-        throw new Error(adminData.message || "Admin registration failed");
+        const errorMessage =
+          adminData.detail?.detail?.[0]?.msg || "Admin registration failed";
+        throw new Error(errorMessage);
       }
 
       // Then, register the practice
@@ -261,24 +266,52 @@ const Register = () => {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Input
-                      id="password1"
-                      type="password"
-                      placeholder="Password"
-                      required
-                      value={formData.password1}
-                      onChange={handleChange}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="password1"
+                        type={showPassword1 ? "text" : "password"}
+                        placeholder="Password"
+                        className="w-full pr-10"
+                        required
+                        value={formData.password1}
+                        onChange={handleChange}
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        onClick={() => setShowPassword1(!showPassword1)}
+                      >
+                        {showPassword1 ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <div className="grid gap-2">
-                    <Input
-                      id="password2"
-                      type="password"
-                      placeholder="Confirm Password"
-                      required
-                      value={formData.password2}
-                      onChange={handleChange}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="password2"
+                        type={showPassword2 ? "text" : "password"}
+                        placeholder="Confirm Password"
+                        className="w-full pr-10"
+                        required
+                        value={formData.password2}
+                        onChange={handleChange}
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        onClick={() => setShowPassword2(!showPassword2)}
+                      >
+                        {showPassword2 ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox

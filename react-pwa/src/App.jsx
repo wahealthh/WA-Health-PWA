@@ -10,6 +10,8 @@ import LandingPage from "./pages/LandingPage";
 import MainLayout from "./layouts/MainLayout";
 import Register from "./pages/auth/Register";
 import RegisterSuccess from "./pages/auth/RegisterSuccess";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 import CallHistoryPage from "./pages/CallHistoryPage";
 import DuePatientsPage from "./pages/DuePatientsPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -23,6 +25,8 @@ const router = createBrowserRouter(
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/register-success" element={<RegisterSuccess />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/call-history" element={<CallHistoryPage />} />
         <Route path="/due-patients" element={<DuePatientsPage />} />
