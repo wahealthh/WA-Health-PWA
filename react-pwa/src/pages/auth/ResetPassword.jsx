@@ -87,6 +87,13 @@ const ResetPassword = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (
+          data.detail?.includes("expired") ||
+          data.detail?.includes("invalid")
+        ) {
+          navigate("/reset-token-expired");
+          return;
+        }
         throw new Error(data.detail || "Failed to reset password");
       }
 
