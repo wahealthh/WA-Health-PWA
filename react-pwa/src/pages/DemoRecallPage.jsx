@@ -10,14 +10,10 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  FaPhone,
-  FaArrowLeft,
-  FaUser,
-  FaEnvelope,
-  FaCalendar,
-} from "react-icons/fa6";
+import { FaArrowLeft, FaUser, FaEnvelope, FaCalendar } from "react-icons/fa6";
 import { PiRobotFill } from "react-icons/pi";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const DemoRecallPage = () => {
   const [formData, setFormData] = useState({
@@ -40,11 +36,18 @@ const DemoRecallPage = () => {
     }));
   };
 
+  const handlePhoneChange = (value) => {
+    setFormData((prev) => ({
+      ...prev,
+      number: value || "",
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Basic validation
-    if (!formData.number || formData.number.length < 10) {
+    if (!formData.number) {
       toast.error("Please enter a valid phone number");
       return;
     }
@@ -69,7 +72,8 @@ const DemoRecallPage = () => {
     try {
       // Call the demo endpoint
       const response = await fetch(
-        "https://recall-backend.wahealth.co.uk/patients/demo/call",
+        // "https://recall-backend.wahealth.co.uk/patients/demo/call",
+        "http://localhost:8000/patients/demo/call",
         {
           method: "POST",
           headers: {
@@ -91,6 +95,14 @@ const DemoRecallPage = () => {
           navigate("/rate-limit-exceeded");
           return;
         }
+
+        // Handle specific error cases
+        if (errorData.detail?.error?.includes("Twilio Error")) {
+          const errorMessage =
+            errorData.detail.error.message || "Invalid phone number";
+          throw new Error(errorMessage);
+        }
+
         throw new Error(
           errorData.detail?.message || "Failed to initiate demo call"
         );
@@ -193,17 +205,12 @@ const DemoRecallPage = () => {
                   Phone Number
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <FaPhone className="h-4 w-4 text-slate-400" />
-                  </div>
-                  <Input
-                    id="number"
-                    name="number"
-                    type="tel"
-                    placeholder="e.g. +447123456789"
+                  <PhoneInput
+                    international
+                    defaultCountry="GB"
                     value={formData.number}
-                    onChange={handleChange}
-                    className="pl-10 border-slate-300 focus:border-purple-400 focus:ring-purple-400 bg-white/50"
+                    onChange={handlePhoneChange}
+                    className="!border-slate-300 focus:!border-purple-400 focus:!ring-purple-400 !bg-white/50"
                     required
                   />
                 </div>
@@ -260,7 +267,7 @@ const DemoRecallPage = () => {
               </div>
 
               <p className="text-xs text-slate-500 pt-1">
-                For demo purposes only.
+                For demo purposes only. We won&apos;t store your information.
               </p>
 
               <Button
