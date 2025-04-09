@@ -72,8 +72,7 @@ const DemoRecallPage = () => {
     try {
       // Call the demo endpoint
       const response = await fetch(
-        // "https://recall-backend.wahealth.co.uk/patients/demo/call",
-        "http://localhost:8000/patients/demo/call",
+        "https://recall-backend.wahealth.co.uk/patients/demo/call",
         {
           method: "POST",
           headers: {
