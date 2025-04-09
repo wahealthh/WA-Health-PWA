@@ -16,6 +16,7 @@ import CallHistoryPage from "./pages/CallHistoryPage";
 import DuePatientsPage from "./pages/DuePatientsPage";
 import DashboardPage from "./pages/DashboardPage";
 import DemoRecallPage from "./pages/DemoRecallPage";
+import RateLimitExceededPage from "./pages/RateLimitExceededPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ResetTokenExpired from "@/pages/auth/ResetTokenExpired";
@@ -33,6 +34,7 @@ const router = createBrowserRouter(
       <Route path="/reset-token-expired" element={<ResetTokenExpired />} />
       <Route path="/email-verified" element={<EmailVerified />} />
       <Route path="/demo-recall" element={<DemoRecallPage />} />
+      <Route path="/rate-limit-exceeded" element={<RateLimitExceededPage />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/call-history" element={<CallHistoryPage />} />
         <Route path="/due-patients" element={<DuePatientsPage />} />

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
   Card,
@@ -30,6 +30,7 @@ const DemoRecallPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [callId, setCallId] = useState(null);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,6 +87,10 @@ const DemoRecallPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        if (response.status === 429) {
+          navigate("/rate-limit-exceeded");
+          return;
+        }
         throw new Error(
           errorData.detail?.message || "Failed to initiate demo call"
         );
