@@ -40,6 +40,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import API_ENDPOINTS from "@/config/api";
 
 const BatchCallsPage = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -71,12 +72,9 @@ const BatchCallsPage = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch(
-          "https://recall-backend.wahealth.co.uk/admin/me",
-          {
-            credentials: "include",
-          }
-        );
+        const response = await fetch(API_ENDPOINTS.admin.me, {
+          credentials: "include",
+        });
 
         if (!response.ok) throw new Error("Failed to fetch user info");
 
@@ -194,7 +192,7 @@ const BatchCallsPage = () => {
 
     try {
       // In a real implementation, you'd send this to your API
-      // const response = await fetch("https://recall-backend.wahealth.co.uk/recalls", {
+      // const response = await fetch(API_ENDPOINTS.patients.recalls, {
       //   method: "POST",
       //   headers: {
       //     "Content-Type": "application/json",

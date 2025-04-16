@@ -18,8 +18,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-
-const API_URL = "https://recall-backend.wahealth.co.uk/patients/due_patients";
+import API_ENDPOINTS from "@/config/api";
 
 const DuePatientsPage = () => {
   const [patients, setPatients] = useState([]);
@@ -38,12 +37,9 @@ const DuePatientsPage = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch(
-          "https://recall-backend.wahealth.co.uk/admin/me",
-          {
-            credentials: "include",
-          }
-        );
+        const response = await fetch(API_ENDPOINTS.admin.me, {
+          credentials: "include",
+        });
 
         if (!response.ok) throw new Error("Failed to fetch user info");
 
@@ -72,7 +68,7 @@ const DuePatientsPage = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch(`${API_URL}`);
+        const response = await fetch(API_ENDPOINTS.patients.duePatients);
 
         if (!response.ok) throw new Error("Failed to fetch patients");
         const data = await response.json();

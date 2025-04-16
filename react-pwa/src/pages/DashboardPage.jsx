@@ -19,12 +19,13 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import API_ENDPOINTS from "@/config/api";
 
 const DashboardPage = () => {
   // State for user and practice info
   const [userInfo, setUserInfo] = useState(null);
   const [practiceInfo, setPracticeInfo] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [userInfoLoading, setUserInfoLoading] = useState(true);
   // We'll use this error state for displaying error messages if needed
   const [error, setError] = useState(null);
 
@@ -37,16 +38,13 @@ const DashboardPage = () => {
   // Get auth context
   const { isAuthenticated } = useContext(AuthContext);
 
-  // Fetch user and practice info - this is the only API call we need for user data
+  // Fetch user and practice info
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch(
-          "https://recall-backend.wahealth.co.uk/admin/me",
-          {
-            credentials: "include",
-          }
-        );
+        const response = await fetch(API_ENDPOINTS.admin.me, {
+          credentials: "include",
+        });
 
         if (!response.ok) throw new Error("Failed to fetch user info");
 
@@ -58,17 +56,16 @@ const DashboardPage = () => {
           setPracticeInfo(data.practice);
         }
       } catch (err) {
-        setError(err.message);
         console.error("User info fetch error:", err);
       } finally {
-        setIsLoading(false);
+        setUserInfoLoading(false);
       }
     };
 
     if (isAuthenticated) {
       fetchUserInfo();
     } else {
-      setIsLoading(false);
+      setUserInfoLoading(false);
     }
   }, [isAuthenticated]);
 
@@ -76,9 +73,9 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchCalls = async () => {
       try {
-        const response = await fetch(
-          "https://recall-backend.wahealth.co.uk/patients/calls?limit=10"
-        );
+        const response = await fetch(API_ENDPOINTS.patients.calls(10), {
+          credentials: "include",
+        });
         if (!response.ok) throw new Error("Failed to fetch calls");
         const data = await response.json();
         setCallsData(data);
@@ -97,9 +94,9 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch(
-          "https://recall-backend.wahealth.co.uk/patients/due_patients"
-        );
+        const response = await fetch(API_ENDPOINTS.patients.duePatients, {
+          credentials: "include",
+        });
         if (!response.ok) throw new Error("Failed to fetch patients");
         const data = await response.json();
         setPatientsData(data);
@@ -136,7 +133,7 @@ const DashboardPage = () => {
           </div>
           <div className="ml-auto mr-4">
             <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 px-3 py-1 text-sm">
-              {isLoading
+              {userInfoLoading
                 ? "..."
                 : practiceInfo?.practice_name || "Your Practice"}
             </Badge>

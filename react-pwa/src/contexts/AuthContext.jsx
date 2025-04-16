@@ -2,6 +2,7 @@
 import { createContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 import Loading from "@/components/loading";
+import API_ENDPOINTS from "@/config/api";
 
 export const AuthContext = createContext(null);
 
@@ -15,12 +16,9 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await fetch(
-        "https://recall-backend.wahealth.co.uk/admin/me",
-        {
-          credentials: "include",
-        }
-      );
+      const response = await fetch(API_ENDPOINTS.admin.me, {
+        credentials: "include",
+      });
       setIsAuthenticated(response.ok);
     } catch (error) {
       console.log(error);
@@ -36,7 +34,7 @@ export const AuthProvider = ({ children }) => {
       formData.append("username", email);
       formData.append("password", password);
 
-      const response = await fetch("https://auth.wahealth.co.uk/auth/token", {
+      const response = await fetch(API_ENDPOINTS.auth.token, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -69,7 +67,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch("https://auth.wahealth.co.uk/auth/logout", {
+      await fetch(API_ENDPOINTS.auth.logout, {
         method: "POST",
         credentials: "include",
       });
