@@ -3,6 +3,7 @@ import {
   createRoutesFromElements,
   Route,
   RouterProvider,
+  Navigate,
 } from "react-router-dom";
 import { Toaster } from "sonner";
 import Login from "./pages/auth/Login";
@@ -21,11 +22,23 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ResetTokenExpired from "@/pages/auth/ResetTokenExpired";
 import EmailVerified from "./pages/auth/EmailVerified";
+import { useAuth } from "@/hooks/useAuth";
+
+// Component to handle conditional redirect based on authentication
+const HomeRoute = () => {
+  const { isAuthenticated } = useAuth();
+
+  return isAuthenticated ? (
+    <Navigate to="/dashboard" replace />
+  ) : (
+    <LandingPage />
+  );
+};
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<MainLayout />}>
-      <Route index element={<LandingPage />} />
+      <Route index element={<HomeRoute />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/register-success" element={<RegisterSuccess />} />
