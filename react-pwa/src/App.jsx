@@ -18,6 +18,7 @@ import DuePatientsPage from "./pages/DuePatientsPage";
 import DashboardPage from "./pages/DashboardPage";
 import DemoRecallPage from "./pages/DemoRecallPage";
 import RateLimitExceededPage from "./pages/RateLimitExceededPage";
+import BatchCallsPage from "./pages/BatchCallsPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ResetTokenExpired from "@/pages/auth/ResetTokenExpired";
@@ -52,6 +53,7 @@ const router = createBrowserRouter(
         <Route path="/call-history" element={<CallHistoryPage />} />
         <Route path="/due-patients" element={<DuePatientsPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/batch-calls" element={<BatchCallsPage />} />
       </Route>
     </Route>
   )

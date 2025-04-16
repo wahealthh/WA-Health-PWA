@@ -61,6 +61,10 @@ const data = {
           title: "Call History",
           url: "/call-history",
         },
+        {
+          title: "Batch Calls",
+          url: "/batch-calls",
+        },
       ],
     },
     {
