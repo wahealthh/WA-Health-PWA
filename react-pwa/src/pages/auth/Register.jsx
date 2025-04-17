@@ -9,6 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Loading from "@/components/loading";
 import { Eye, EyeOff } from "lucide-react";
+import API_ENDPOINTS from "@/config/api";
 
 const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -84,23 +85,20 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const adminResponse = await fetch(
-        "https://recall-backend.wahealth.co.uk/admin/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            first_name: formData.admin_first_name,
-            last_name: formData.admin_last_name,
-            email: formData.admin_email,
-            password1: formData.password1,
-            password2: formData.password2,
-          }),
-        }
-      );
+      const adminResponse = await fetch(API_ENDPOINTS.admin.register, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          first_name: formData.admin_first_name,
+          last_name: formData.admin_last_name,
+          email: formData.admin_email,
+          password1: formData.password1,
+          password2: formData.password2,
+        }),
+      });
 
       const adminData = await adminResponse.json();
 
@@ -118,27 +116,24 @@ const Register = () => {
       }
 
       // Then, register the practice
-      const practiceResponse = await fetch(
-        "https://recall-backend.wahealth.co.uk/practice/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            // If the admin registration returns a token, you might need to include it here
-            ...(adminData.access_token && {
-              Authorization: `Bearer ${adminData.access_token}`,
-            }),
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            practice_name: formData.practice_name,
-            practice_address: formData.practice_address,
-            practice_email: formData.practice_email,
-            practice_phone_number: formData.practice_phone_number,
-            admin_id: adminData.id,
+      const practiceResponse = await fetch(API_ENDPOINTS.practice.register, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // If the admin registration returns a token, you might need to include it here
+          ...(adminData.access_token && {
+            Authorization: `Bearer ${adminData.access_token}`,
           }),
-        }
-      );
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          practice_name: formData.practice_name,
+          practice_address: formData.practice_address,
+          practice_email: formData.practice_email,
+          practice_phone_number: formData.practice_phone_number,
+          admin_id: adminData.id,
+        }),
+      });
 
       const practiceData = await practiceResponse.json();
 

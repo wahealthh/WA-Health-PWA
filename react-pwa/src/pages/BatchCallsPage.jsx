@@ -52,6 +52,7 @@ const BatchCallsPage = () => {
   // State for manual patient form
   const [recallGroup, setRecallGroup] = useState({
     name: "",
+    description: "",
     patients: [
       {
         id: 1,
@@ -60,7 +61,7 @@ const BatchCallsPage = () => {
         number: "",
         email: "",
         dob: "",
-        condition: "",
+        notes: "",
       },
     ],
   });
@@ -123,7 +124,7 @@ const BatchCallsPage = () => {
           number: "",
           email: "",
           dob: "",
-          condition: "",
+          notes: "",
         },
       ],
     });
@@ -183,7 +184,12 @@ const BatchCallsPage = () => {
 
     if (
       recallGroup.patients.some(
-        (p) => !p.first_name.trim() || !p.last_name.trim() || !p.number
+        (p) =>
+          !p.first_name.trim() ||
+          !p.last_name.trim() ||
+          !p.number ||
+          !p.email.trim() ||
+          !p.dob
       )
     ) {
       toast.error("Please fill in all required patient details");
@@ -191,25 +197,62 @@ const BatchCallsPage = () => {
     }
 
     try {
-      // In a real implementation, you'd send this to your API
-      // const response = await fetch(API_ENDPOINTS.patients.recalls, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   credentials: "include",
-      //   body: JSON.stringify(recallGroup),
-      // });
+      // First, create the recall group
+      const groupResponse = await fetch(API_ENDPOINTS.recalls.groups, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: recallGroup.name,
+          description: recallGroup.description,
+        }),
+      });
 
-      // if (!response.ok) throw new Error("Failed to create recall group");
+      if (!groupResponse.ok) {
+        const errorData = await groupResponse.json();
+        throw new Error(errorData.message || "Failed to create recall group");
+      }
 
-      // For demo purposes
-      console.log("Creating recall group:", recallGroup);
+      // Get the group ID from the response
+      const groupData = await groupResponse.json();
+      const groupId = groupData.id;
+
+      // Then, add patients to the group
+      const patientsFormatted = recallGroup.patients.map((patient) => ({
+        first_name: patient.first_name,
+        last_name: patient.last_name,
+        email: patient.email,
+        number: patient.number,
+        dob: patient.dob,
+        notes: patient.notes,
+      }));
+
+      const patientsResponse = await fetch(
+        API_ENDPOINTS.recalls.groupPatients(groupId),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(patientsFormatted),
+        }
+      );
+
+      if (!patientsResponse.ok) {
+        const errorData = await patientsResponse.json();
+        throw new Error(
+          errorData.message || "Failed to add patients to recall group"
+        );
+      }
 
       toast.success("Clinical recall group created successfully");
-      navigate("/call-history");
+      navigate(`/recall-group/${groupId}/confirm`, { state: { recallGroup } });
     } catch (error) {
       toast.error("Failed to create recall group: " + error.message);
+      console.error("Recall group creation error:", error);
     }
   };
 
@@ -276,19 +319,32 @@ const BatchCallsPage = () => {
                 <CardHeader>
                   <CardTitle>Recall Group Details</CardTitle>
                   <CardDescription>
-                    Name this recall group for easy identification (e.g., Asthma
-                    Annual Review Q3)
+                    Name this recall group for easy identification and add an
+                    optional description for more details.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="group-name">Group Name</Label>
-                    <Input
-                      id="group-name"
-                      placeholder="Enter recall group name"
-                      value={recallGroup.name}
-                      onChange={(e) => handleInputChange(e, "name")}
-                    />
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="group-name">
+                        Group Name <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="group-name"
+                        placeholder="(e.g., Asthma Annual Review Q3)"
+                        value={recallGroup.name}
+                        onChange={(e) => handleInputChange(e, "name")}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="group-description">Description</Label>
+                      <Input
+                        id="group-description"
+                        placeholder="Enter recall group description"
+                        value={recallGroup.description}
+                        onChange={(e) => handleInputChange(e, "description")}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -377,7 +433,9 @@ const BatchCallsPage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-1.5">
-                            <Label htmlFor={`email-${patient.id}`}>Email</Label>
+                            <Label htmlFor={`email-${patient.id}`}>
+                              Email <span className="text-destructive">*</span>
+                            </Label>
                             <div className="relative">
                               <FaEnvelope className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
                               <Input
@@ -394,7 +452,8 @@ const BatchCallsPage = () => {
                           </div>
                           <div className="space-y-1.5">
                             <Label htmlFor={`dob-${patient.id}`}>
-                              Date of Birth
+                              Date of Birth{" "}
+                              <span className="text-destructive">*</span>
                             </Label>
                             <div className="relative">
                               <FaCalendar className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
@@ -412,15 +471,13 @@ const BatchCallsPage = () => {
                         </div>
 
                         <div className="space-y-1.5">
-                          <Label htmlFor={`condition-${patient.id}`}>
-                            Condition/Notes
-                          </Label>
+                          <Label htmlFor={`notes-${patient.id}`}>Notes</Label>
                           <Input
-                            id={`condition-${patient.id}`}
+                            id={`notes-${patient.id}`}
                             placeholder="e.g., Asthma, Diabetes, Medication Check"
-                            value={patient.condition}
+                            value={patient.notes}
                             onChange={(e) =>
-                              handleInputChange(e, "condition", patient.id)
+                              handleInputChange(e, "notes", patient.id)
                             }
                           />
                         </div>
@@ -471,8 +528,8 @@ const BatchCallsPage = () => {
                   </p>
                   {/* <Button>Select File</Button> */}
                   <p className="text-xs text-muted-foreground mt-2 max-w-xs text-center">
-                    Required columns: First Name, Last Name, Phone Number.
-                    Optional: Email, Date of Birth, Condition/Notes
+                    Required columns: First Name, Last Name, Phone Number,
+                    Email, Date of Birth. Optional: Notes
                   </p>
                 </CardContent>
               </Card>

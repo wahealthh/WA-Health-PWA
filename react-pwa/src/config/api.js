@@ -7,7 +7,7 @@ const API_BASE = {
 };
 
 const AUTH_BASE = {
-  local: "http://localhost:8000",
+  local: "http://localhost:8001",
   development: "https://auth.wahealth.co.uk",
   staging: "https://staging.auth.wahealth.co.uk",
   production: "https://auth.wahealth.co.uk",
@@ -15,14 +15,18 @@ const AUTH_BASE = {
 
 // Determine current environment
 // Use LOCAL_API env var or fallback to the mode
-const ENV =
-  import.meta.env.VITE_USE_LOCAL_API === "true"
-    ? "local"
-    : import.meta.env.MODE || "development";
+// const ENV =
+//   import.meta.env.VITE_USE_LOCAL_API === "true"
+//     ? "local"
+//     : import.meta.env.MODE || "development";
 
 // Construct base URLs based on environment
-const API_URL = API_BASE[ENV];
-const AUTH_URL = AUTH_BASE[ENV];
+// const API_URL = API_BASE["local"];
+// const AUTH_URL = AUTH_BASE["local"];
+
+// dev base urls
+const API_URL = API_BASE["development"];
+const AUTH_URL = AUTH_BASE["development"];
 
 // API endpoints grouped by category
 export const API_ENDPOINTS = {
@@ -32,6 +36,7 @@ export const API_ENDPOINTS = {
     resetPassword: (token) => `${AUTH_URL}/auth/reset-password-form/${token}`,
   },
   admin: {
+    register: `${API_URL}/admin/register`,
     me: `${API_URL}/admin/me`,
   },
   practice: {
@@ -44,6 +49,10 @@ export const API_ENDPOINTS = {
     callPatient: `${API_URL}/patients/call_patient`,
     demoCall: `${API_URL}/patients/demo/call`,
     recalls: `${API_URL}/recalls`,
+  },
+  recalls: {
+    groups: `${API_URL}/recall/groups`,
+    groupPatients: (groupId) => `${API_URL}/recall/groups/${groupId}/patients`,
   },
 };
 

@@ -19,6 +19,7 @@ import DashboardPage from "./pages/DashboardPage";
 import DemoRecallPage from "./pages/DemoRecallPage";
 import RateLimitExceededPage from "./pages/RateLimitExceededPage";
 import BatchCallsPage from "./pages/BatchCallsPage";
+import RecallGroupConfirmationPage from "./pages/RecallGroupConfirmationPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ResetTokenExpired from "@/pages/auth/ResetTokenExpired";
@@ -50,10 +51,15 @@ const router = createBrowserRouter(
       <Route path="/demo-recall" element={<DemoRecallPage />} />
       <Route path="/rate-limit-exceeded" element={<RateLimitExceededPage />} />
       <Route element={<ProtectedRoute />}>
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/call-history" element={<CallHistoryPage />} />
         <Route path="/due-patients" element={<DuePatientsPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/batch-calls" element={<BatchCallsPage />} />
+        <Route
+          path="/recall-group/:groupId/confirm"
+          element={<RecallGroupConfirmationPage />}
+        />
       </Route>
     </Route>
   )
