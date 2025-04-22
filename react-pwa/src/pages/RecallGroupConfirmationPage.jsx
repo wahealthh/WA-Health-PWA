@@ -38,6 +38,7 @@ const RecallGroupConfirmationPage = () => {
 
   // State from BatchCallsPage (passed via navigate state)
   const initialRecallGroup = location.state?.recallGroup;
+  const importedCount = location.state?.importedCount;
 
   const [recallGroup, setRecallGroup] = useState(initialRecallGroup || null);
   const [callContext, setCallContext] = useState("");
@@ -137,28 +138,21 @@ const RecallGroupConfirmationPage = () => {
     }
 
     try {
-      // Format patients for the API call
-      const patientsToCall = recallGroup.patients.map((patient) => ({
-        first_name: patient.first_name,
-        last_name: patient.last_name,
-        email: patient.email,
-        number: patient.number,
-        dob: patient.dob,
-        notes: patient.notes || "",
-      }));
+      // Notify user that calls are being initiated
+      toast.info(`Initiating calls for group ${groupId}...`);
 
-      // Make API call to initiate calls
-      toast.info(`Initiating calls to ${patientsToCall.length} patients...`);
-
-      const response = await fetch(API_ENDPOINTS.patients.callDuePatients, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          patients: patientsToCall,
-          call_context: callContext,
-        }),
-      });
+      // Make API call to initiate calls using the groupId in the URL path
+      const response = await fetch(
+        API_ENDPOINTS.patients.callPatientsByGroup(groupId),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            call_context: callContext,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -166,9 +160,7 @@ const RecallGroupConfirmationPage = () => {
       }
 
       // Handle successful response
-      toast.success(
-        `Calls initiated successfully for ${patientsToCall.length} patients!`
-      );
+      toast.success("Calls initiated successfully!");
 
       // Navigate to call history to see results
       navigate("/call-history");
@@ -222,7 +214,8 @@ const RecallGroupConfirmationPage = () => {
     );
   }
 
-  const patientCount = recallGroup.patients?.length || 0;
+  // Use imported count for CSV uploads, or patient array length for manual entry
+  const patientCount = importedCount || recallGroup.patients?.length || 0;
 
   return (
     <SidebarProvider>

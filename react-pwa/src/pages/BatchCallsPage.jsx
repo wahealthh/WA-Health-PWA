@@ -66,6 +66,16 @@ const BatchCallsPage = () => {
     ],
   });
 
+  // State for CSV upload
+  const [csvData, setCsvData] = useState({
+    name: "",
+    description: "",
+    file: null,
+    fileContent: "",
+    isUploading: false,
+    dragActive: false,
+  });
+
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
@@ -260,6 +270,197 @@ const BatchCallsPage = () => {
   const handleBack = () => {
     setSelectedOption(null);
     setIsModalOpen(true);
+  };
+
+  // Handle CSV file input change
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      processCSVFile(file);
+    }
+  };
+
+  // Handle CSV drag events
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setCsvData((prev) => ({ ...prev, dragActive: true }));
+    } else if (e.type === "dragleave") {
+      setCsvData((prev) => ({ ...prev, dragActive: false }));
+    }
+  };
+
+  // Handle CSV drop event
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCsvData((prev) => ({ ...prev, dragActive: false }));
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processCSVFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  // Process the CSV file
+  const processCSVFile = (file) => {
+    setCsvData((prev) => ({ ...prev, file: file }));
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target.result;
+      setCsvData((prev) => ({ ...prev, fileContent: content }));
+    };
+    reader.readAsText(file);
+  };
+
+  // Download sample CSV template
+  const downloadSampleCSV = () => {
+    const headers = [
+      "first_name",
+      "last_name",
+      "email",
+      "number",
+      "dob",
+      "notes",
+    ];
+    const sampleData = [
+      [
+        "Nuru",
+        "Ahmed",
+        "nuru@wahealth.co.uk",
+        "+2347018771687",
+        "1980-01-01",
+        "Asthma patient",
+      ],
+      [
+        "Hauwa",
+        "Hakimi",
+        "hauwahakimi@wahealth.co.uk",
+        "+447568655010",
+        "1980-01-01",
+        "Annual review",
+      ],
+    ];
+
+    let csvContent = headers.join(",") + "\n";
+    sampleData.forEach((row) => {
+      csvContent += row.join(",") + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "sample_patients.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Handle CSV input changes
+  const handleCSVInputChange = (e) => {
+    const { id, value } = e.target;
+    setCsvData((prev) => ({ ...prev, [id.replace("csv-", "")]: value }));
+  };
+
+  // Submit CSV data to create group and import patients
+  const submitCSVData = async () => {
+    // Validation
+    if (!csvData.name.trim()) {
+      toast.error("Please enter a name for the clinical recall group");
+      return;
+    }
+
+    if (!csvData.file || !csvData.fileContent) {
+      toast.error("Please upload a CSV file");
+      return;
+    }
+
+    setCsvData((prev) => ({ ...prev, isUploading: true }));
+
+    try {
+      // First, create the recall group (same as manual process)
+      const groupResponse = await fetch(API_ENDPOINTS.recalls.groups, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: csvData.name,
+          description: csvData.description,
+        }),
+      });
+
+      if (!groupResponse.ok) {
+        const errorData = await groupResponse.json();
+        throw new Error(errorData.message || "Failed to create recall group");
+      }
+
+      // Get the group ID from the response
+      const groupData = await groupResponse.json();
+      const groupId = groupData.id;
+
+      // Then, send the CSV file content to import patients to this group
+      const importResponse = await fetch(
+        API_ENDPOINTS.recalls.importCSV(groupId),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            file_content: csvData.fileContent,
+          }),
+        }
+      );
+
+      if (!importResponse.ok) {
+        const errorData = await importResponse.json();
+        throw new Error(
+          errorData.message || "Failed to import patients from CSV"
+        );
+      }
+
+      const importData = await importResponse.json();
+
+      // Check if there were any errors during import
+      if (importData.errors && importData.errors.length > 0) {
+        toast.warning(
+          `Imported ${importData.imported_count} patients with ${importData.errors.length} errors`
+        );
+        console.warn("CSV import errors:", importData.errors);
+      } else {
+        toast.success(
+          `Successfully imported ${importData.imported_count} patients`
+        );
+      }
+
+      // Create a recallGroup object to pass to the confirmation page
+      const formattedRecallGroup = {
+        id: groupId,
+        name: csvData.name,
+        description: csvData.description,
+        patients: [], // The actual patients are in the backend now
+      };
+
+      // Navigate to confirmation page (same as manual process)
+      navigate(`/recall-group/${groupId}/confirm`, {
+        state: {
+          recallGroup: formattedRecallGroup,
+          importedCount: importData.imported_count,
+        },
+      });
+    } catch (error) {
+      toast.error("Failed to create recall group: " + error.message);
+      console.error("CSV upload error:", error);
+    } finally {
+      setCsvData((prev) => ({ ...prev, isUploading: false }));
+    }
   };
 
   return (
@@ -511,6 +712,43 @@ const BatchCallsPage = () => {
                   Back to Options
                 </Button>
               </div>
+
+              {/* Group Details Card - similar to manual method */}
+              <Card className="mb-6 border-primary/20">
+                <CardHeader>
+                  <CardTitle>Recall Group Details</CardTitle>
+                  <CardDescription>
+                    Name this recall group for easy identification and add an
+                    optional description for more details.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="csv-name">
+                        Group Name <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="csv-name"
+                        placeholder="(e.g., Asthma Annual Review Q3)"
+                        value={csvData.name}
+                        onChange={handleCSVInputChange}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="csv-description">Description</Label>
+                      <Input
+                        id="csv-description"
+                        placeholder="Enter recall group description"
+                        value={csvData.description}
+                        onChange={handleCSVInputChange}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* CSV Upload Card */}
               <Card>
                 <CardHeader>
                   <CardTitle>CSV Upload</CardTitle>
@@ -518,19 +756,87 @@ const BatchCallsPage = () => {
                     Upload a spreadsheet with patient details for recall
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-4 py-12 border-2 border-dashed border-muted rounded-lg hover:border-primary/50 transition-colors">
-                  <Upload className="h-12 w-12 text-muted-foreground" />
-                  <p className="text-center text-muted-foreground">
-                    Drag and drop your CSV file here, or{" "}
-                    <Button variant="link" className="p-0 h-auto">
-                      click to browse
+                <CardContent>
+                  <div
+                    className={`flex flex-col items-center justify-center gap-4 py-12 border-2 border-dashed ${
+                      csvData.dragActive ? "border-primary" : "border-muted"
+                    } rounded-lg hover:border-primary/50 transition-colors`}
+                    onDragEnter={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDragOver={handleDrag}
+                    onDrop={handleDrop}
+                  >
+                    <input
+                      type="file"
+                      id="csv-file-upload"
+                      accept=".csv"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+
+                    {csvData.file ? (
+                      <div className="text-center">
+                        <Badge variant="outline" className="mb-2 px-3 py-1">
+                          {csvData.file.name}
+                        </Badge>
+                        <p className="text-sm text-muted-foreground">
+                          File selected. Click "Import Patients" below when
+                          ready.
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload className="h-12 w-12 text-muted-foreground" />
+                        <p className="text-center text-muted-foreground">
+                          Drag and drop your CSV file here, or{" "}
+                          <Button
+                            variant="link"
+                            className="p-0 h-auto"
+                            onClick={() =>
+                              document.getElementById("csv-file-upload").click()
+                            }
+                          >
+                            click to browse
+                          </Button>
+                        </p>
+                      </>
+                    )}
+
+                    <div className="w-full max-w-xs">
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                        Required columns: First Name, Last Name, Phone Number,
+                        Email, Date of Birth. Optional: Notes
+                      </p>
+                      <Button
+                        variant="link"
+                        size="sm"
+                        onClick={downloadSampleCSV}
+                        className="w-full mt-2 text-xs"
+                      >
+                        Download Sample Template
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex justify-end">
+                    <Button
+                      onClick={submitCSVData}
+                      disabled={csvData.isUploading || !csvData.file}
+                      className="flex items-center gap-2"
+                    >
+                      {csvData.isUploading ? (
+                        <>
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                          Importing...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4" />
+                          Import Patients
+                        </>
+                      )}
                     </Button>
-                  </p>
-                  {/* <Button>Select File</Button> */}
-                  <p className="text-xs text-muted-foreground mt-2 max-w-xs text-center">
-                    Required columns: First Name, Last Name, Phone Number,
-                    Email, Date of Birth. Optional: Notes
-                  </p>
+                  </div>
                 </CardContent>
               </Card>
             </div>

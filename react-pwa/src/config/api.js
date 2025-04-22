@@ -48,12 +48,15 @@ export const API_ENDPOINTS = {
       `${API_URL}/patients/calls${limit ? `?limit=${limit}` : ""}`,
     callPatient: `${API_URL}/patients/call_patient`,
     callDuePatients: `${API_URL}/patients/call_due_patients`,
+    callPatientsByGroup: (groupId) =>
+      `${API_URL}/patients/groups/${groupId}/call`,
     demoCall: `${API_URL}/patients/demo/call`,
     recalls: `${API_URL}/recalls`,
   },
   recalls: {
     groups: `${API_URL}/recall/groups`,
     groupPatients: (groupId) => `${API_URL}/recall/groups/${groupId}/patients`,
+    importCSV: (groupId) => `${API_URL}/recall/groups/${groupId}/import-csv`,
   },
 };
 
