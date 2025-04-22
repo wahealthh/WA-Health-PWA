@@ -25,8 +25,8 @@ const AUTH_BASE = {
 // const AUTH_URL = AUTH_BASE["local"];
 
 // dev base urls
-const API_URL = API_BASE["development"];
-const AUTH_URL = AUTH_BASE["development"];
+const API_URL = API_BASE["local"];
+const AUTH_URL = AUTH_BASE["local"];
 
 // API endpoints grouped by category
 export const API_ENDPOINTS = {

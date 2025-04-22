@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
 "use client";
 
-import { BadgeCheck, Bell, LogOut, Sparkles } from "lucide-react";
+import { BadgeCheck, Bell, LogOut, Sparkles, Moon, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -28,6 +29,7 @@ export function NavUser({ user }) {
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   const handleLogout = async () => {
     try {
@@ -37,6 +39,10 @@ export function NavUser({ user }) {
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -83,6 +89,14 @@ export function NavUser({ user }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+              <DropdownMenuItem onClick={toggleTheme}>
+                {theme === "dark" ? (
+                  <Sun className="mr-2" />
+                ) : (
+                  <Moon className="mr-2" />
+                )}
+                {theme === "dark" ? "Light Mode" : "Dark Mode"}
+              </DropdownMenuItem>
               <DropdownMenuItem>
                 <Sparkles />
                 Upgrade to Pro

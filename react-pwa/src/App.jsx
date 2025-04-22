@@ -5,7 +5,8 @@ import {
   RouterProvider,
   Navigate,
 } from "react-router-dom";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Login from "./pages/auth/Login";
 import LandingPage from "./pages/LandingPage";
 import MainLayout from "./layouts/MainLayout";
@@ -67,10 +68,12 @@ const router = createBrowserRouter(
 
 const App = () => {
   return (
-    <AuthProvider>
-      <Toaster />
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Toaster />
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

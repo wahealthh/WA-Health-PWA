@@ -213,14 +213,14 @@ const DashboardPage = () => {
           {/* Detailed Data Section */}
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Recent Calls */}
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+            <div className="bg-background rounded-lg shadow-sm p-6 border border-border">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-foreground">
                   Recent Calls
                 </h2>
                 <a
                   href="/call-history"
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  className="text-primary hover:text-primary/80 text-sm font-medium"
                 >
                   View All →
                 </a>
@@ -251,14 +251,14 @@ const DashboardPage = () => {
             </div>
 
             {/* Due Patients */}
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+            <div className="bg-background rounded-lg shadow-sm p-6 border border-border">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-foreground">
                   Patients Due for Follow-up
                 </h2>
                 <a
                   href="/due-patients"
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  className="text-primary hover:text-primary/80 text-sm font-medium"
                 >
                   View All →
                 </a>
