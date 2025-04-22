@@ -474,7 +474,7 @@ const BatchCallsPage = () => {
                           <Label htmlFor={`notes-${patient.id}`}>Notes</Label>
                           <Input
                             id={`notes-${patient.id}`}
-                            placeholder="e.g., Asthma, Diabetes, Medication Check"
+                            placeholder="add notes specific to this patient"
                             value={patient.notes}
                             onChange={(e) =>
                               handleInputChange(e, "notes", patient.id)

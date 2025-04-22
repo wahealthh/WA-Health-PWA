@@ -47,6 +47,7 @@ export const API_ENDPOINTS = {
     calls: (limit = "") =>
       `${API_URL}/patients/calls${limit ? `?limit=${limit}` : ""}`,
     callPatient: `${API_URL}/patients/call_patient`,
+    callDuePatients: `${API_URL}/patients/call_due_patients`,
     demoCall: `${API_URL}/patients/demo/call`,
     recalls: `${API_URL}/recalls`,
   },

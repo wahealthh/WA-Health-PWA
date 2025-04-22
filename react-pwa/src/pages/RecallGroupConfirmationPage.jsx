@@ -26,15 +26,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import API_ENDPOINTS from "@/config/api"; // Assuming you have endpoints defined
+import API_ENDPOINTS from "@/config/api";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth"; // Assuming useAuth provides user/practice info
+import { useAuth } from "@/hooks/useAuth";
 
 const RecallGroupConfirmationPage = () => {
   const { groupId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth(); // Use auth context if needed for user/practice info
+  const { isAuthenticated } = useAuth();
 
   // State from BatchCallsPage (passed via navigate state)
   const initialRecallGroup = location.state?.recallGroup;
@@ -135,28 +135,47 @@ const RecallGroupConfirmationPage = () => {
       toast.error("Please provide a context for the call.");
       return;
     }
-    // --- TODO: Implement API call to initiate calls immediately ---
-    console.log(
-      "Calling patients now with context:",
-      callContext,
-      "for group:",
-      recallGroup
-    );
-    toast.info("Initiating calls... (API not implemented)");
-    // Example API call structure:
-    // try {
-    //   const response = await fetch(API_ENDPOINTS.recalls.callGroupNow(groupId), {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     credentials: 'include',
-    //     body: JSON.stringify({ call_context: callContext })
-    //   });
-    //   if (!response.ok) throw new Error('Failed to initiate calls');
-    //   toast.success("Calls initiated successfully!");
-    //   navigate('/call-history'); // Navigate to call history or dashboard
-    // } catch (error) {
-    //   toast.error(`Failed to initiate calls: ${error.message}`);
-    // }
+
+    try {
+      // Format patients for the API call
+      const patientsToCall = recallGroup.patients.map((patient) => ({
+        first_name: patient.first_name,
+        last_name: patient.last_name,
+        email: patient.email,
+        number: patient.number,
+        dob: patient.dob,
+        notes: patient.notes || "",
+      }));
+
+      // Make API call to initiate calls
+      toast.info(`Initiating calls to ${patientsToCall.length} patients...`);
+
+      const response = await fetch(API_ENDPOINTS.patients.callDuePatients, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          patients: patientsToCall,
+          call_context: callContext,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to initiate calls");
+      }
+
+      // Handle successful response
+      toast.success(
+        `Calls initiated successfully for ${patientsToCall.length} patients!`
+      );
+
+      // Navigate to call history to see results
+      navigate("/call-history");
+    } catch (error) {
+      console.error("Error initiating calls:", error);
+      toast.error(`Failed to initiate calls: ${error.message}`);
+    }
   };
 
   const handleScheduleCall = () => {
@@ -281,10 +300,8 @@ const RecallGroupConfirmationPage = () => {
                 <CardTitle>Set Call Context</CardTitle>
                 <CardDescription>
                   Provide the primary reason or context for this recall
-                  campaign. This helps the AI understand the call&apos;s purpose
-                  (e.g., &quot;Annual Asthma Review Invitation&quot;, &quot;Flu
-                  Vaccination Reminder&quot;, &quot;Follow-up for Diabetes
-                  Check&quot;).
+                  campaign. Add any additional details that will help the AI
+                  understand the call&apos;s purpose and what to say.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
